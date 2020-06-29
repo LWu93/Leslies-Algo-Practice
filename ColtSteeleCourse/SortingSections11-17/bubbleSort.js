@@ -26,5 +26,5 @@ const bubbleSort = (arr) => {
 
 bubbleSort([5, 2, 6, 19, 23, 15, 24]) //[2,5,6,15,19,23,24]
 
-//Time Complexity - O(n^2) worse case is we full go through easy nested for loop
+//Time Complexity - O(n^2) worse case is we full go through every nested for loop
 //Space Complexity - O(1) swapping inplace
