@@ -39,3 +39,9 @@ const mergeSort = (arr) => {
 }
 
 mergeSort([100,1,2,3,300,200]) // return [1,2,3,100,200,300]
+
+//Time Complexity - O(n log n)
+//we are splitting the arr in half every time we are mergeSorting.
+//there is still n space complexity because you still have to loop through the entire arr to sort
+//Space Complexity - O(n)
+//mergeSort creates a new arr every time mergeSort is called and returns a new arr
