@@ -148,3 +148,9 @@ class SinglyLinkedList {
   }
 
 }
+/*
+Time Complexity
+adding - O(1)
+removing - O(n)
+searching - O(n)
+accessing - O(n)
