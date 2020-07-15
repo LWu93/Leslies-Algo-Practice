@@ -57,7 +57,7 @@ class PriorityQueue {
 
   dequeue() {
     const min = this.values[0];
-    const end = this.values.pop;
+    const end = this.values.pop();
     //Edge Case - when this.values has 1 element left in its arr, it continues to set the 0th idx back to the val we popped off.
     if (this.values.length > 0) {
       this.values[0] = end;
@@ -91,8 +91,8 @@ class PriorityQueue {
       if (rightChildIdx < length) {
         rightChild = this.values[rightChildIdx]
         if (
-          (swap === null && rightChild.priority > element.priority) ||
-          (swap !== null && rightChild.priority > leftChild.priority)
+          (swap === null && rightChild.priority < element.priority) ||
+          (swap !== null && rightChild.priority < leftChild.priority)
           ) {
             swap = rightChildIdx
         }
