@@ -45,27 +45,27 @@ var spiralOrder = function(matrix) {
   while (r1 <= r2 && c1 <= c2) {
     //top - keep r1 constant, push in r1's eles. r1++
     for (let i = c1; i <= c2; i++) {
-        res.push(matrix[r1][i])
+      res.push(matrix[r1][i])
     }
 
     //right - keep c2 constant, push in its c2 eles. c2--
     //+1 to account for its most right ele
     for (let j = r1 + 1; j <= r2; j++) {
-        res.push(matrix[j][c2])
+      res.push(matrix[j][c2])
     }
 
     //Account for if its a rectangle (Ex 2) and not a perfect square
     if (r1 < r2 && c1 < c2) {
-        //bottom - keep r2 constant, push in its r2 vals. r2--
-        //-1 to account for its bottom right ele
-        for (let k = c2 - 1; k > c1; k--) {
-            res.push(matrix[r2][k])
-        }
+      //bottom - keep r2 constant, push in its r2 vals. r2--
+      //-1 to account for its bottom right ele
+      for (let k = c2 - 1; k > c1; k--) {
+        res.push(matrix[r2][k])
+      }
 
-        //left - keep c1 constant, push in its c1 vals. c1++
-        for (let l = r2; l > r1; l--) {
-            res.push(matrix[l][c1])
-        }
+      //left - keep c1 constant, push in its c1 vals. c1++
+      for (let l = r2; l > r1; l--) {
+        res.push(matrix[l][c1])
+      }
     }
 
     r1++;
