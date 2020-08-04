@@ -65,4 +65,4 @@ var groupAnagrams = function(strs) {
 };
 //n - strs.length. m - longest string.length.
 //Time - O(n*m). looping through strs and each letter of the word.
-//Space - O(n*m). hash is storing n * m amount of data.
+//Space - O(n). hash is storing n and returning n amount of words.
