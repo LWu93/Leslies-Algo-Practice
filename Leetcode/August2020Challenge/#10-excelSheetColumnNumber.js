@@ -22,7 +22,7 @@ var titleToNumber = function(s) {
     startingA++
   }
 
-  for (let i = 0; i < s.length; i++) {
+  for (let i = s.length-1; i >= 0; i--) {
     total += (map.get(s[i]) * multiple)
     multiple *= 26
   }
