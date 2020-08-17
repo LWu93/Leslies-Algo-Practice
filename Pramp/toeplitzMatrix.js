@@ -25,59 +25,135 @@ Constraints:
 */
 
 
+/*  Psuedocode
+it should check if every left -> right are the same
+
+theres a pattern with the idx points where each val is suppose to match
+for ex: 0,0 1,1 2,2  --> point at 0. 0,1 1,2 2,3 --> points to 1.
+
+we can double for loop through our matrix and store each val in a map and have a set as val.
+IF, our set.size is ever bigger than 1, that means our left->right diagonal has diff ele's
+ELSE, loop through the entire matrix and if we hit the end, we can return true
+
+*/
+
+function isToeplitz(arr) {
+	/**
+	@param arr: integer[][]
+	@return: boolean
+	*/
+
+  let map = new Map();
+
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr[i].length; j++) {
+      let idxDiff = j-i, currVal = arr[i][j];
+
+      if (!map.has(idxDiff)) map.set(idxDiff, new Set());
+      let set = map.get(idxDiff)
+      set.add(currVal)
+      if (set.size >= 2) return false;
+    }
+  }
+
+  return true;
+}
+//n - arr.length. m - arr[0].length
+//Time - O(n*m).
+//Space - O(n+m). Additional space taken up on keys in our map. keys --> diagonals which is n+m-1.
+
+//Optimized Approach - We can use no space by checking the previous diagonal val and if its equal to the currVal.
+//This works because we avoid the diagonals with only 1 ele and there MUST be only 1 unique val in that diagonal and they cant be skipped,, ex: 1 3 1.
+
+ function isToeplitz(arr) {
+	/**
+	@param arr: integer[][]
+	@return: boolean
+	*/
+
+  for (let i = 1; i < arr.length; i++) {
+    for (let j = 1; j < arr[i].length; j++) {
+      let idxDiff = j-i, currVal = arr[i][j];
+
+      if (arr[i-1][j-1] !== arr[i][j]) return false
+    }
+  }
+
+  return true;
+}
+//n - arr.length. m - arr[0].length
+//Time - O(n*m).
+//Space - O(1).
+
 /*
 ============== HINT ==============
 
-If your peer is stuck, ask them if they know how to traverse a undirected graph.
-At this point, you peer may come up with a recursive solution by using a Breadth-First Search (BFS) or a Depth-First Search (DFS) algorithm. While this works, see if you can nudge them toward an iterative solution. This is not a must, but preferable.
-Make sure that your peer’s code does not access out of bound indices, especially when trying to traverse adjacent cells in binaryMatrix.
-Watch out for duplicate island counting in your peer’s code. It’s important that a visited cell of 1 is marked properly to avoid redundant counting.
-Any solution that takes more than O(N⋅M) time isn’t optimal.
+What are all the terms of the diagonal that starts at the top left corner? What about the terms of the diagonal immediately to the right of it?
+
+Say there are R rows and C columns. How do we know whether r and c represent some element arr[r][c] in the array?
+
+How many different left-to-right-descending diagonals are there, in terms of R and C?
+
+If the user is stuck on checking each individual diagonal, try solving for the case of a generic 1-dimensional array. If we wanted to know whether all the elements in a single 1-dimensional array are the same, how might we solve that problem?
 
 ============== ANSWER ==============
 
-This problem is very similar to counting the number of connected components in an Undirected Graph. However, Graph Theory isn’t necessary to solve this problem or to understand its solution. In an undirected graph, a connected component is a group of vertices in which every vertex is connected to at least one other vertex. In a similar way, an island in the matrix is a group of adjacent (connected) 1s.
+There are R+C-1 different diagonals, because each diagonal starts with an element in the top left (marked “S” as pictured below):
 
-To solve this problem, we’ll traverse binaryMatrix and every time we come across a cell of 1 we’ll do the following: Change that cell and all its vertically and horizontally (but not diagonally) adjacent 1s into -1s. We do this “expansion” in order to avoid recounting of islands. Increment islands - which is our counter for number of islands - by 1. Expanding from a cell whose value is 1 to other adjacent 1s in binaryMatrix is similar to running a Breadth-First Search (BFS) or a Depth-First Search (DFS).
+[[S,S,S,S], [S,,,], [S,,,]]
 
-In our case, we’ll avoid using a recursion and instead opt for an iterative approach to expand to all adjacent 1s. We do so by using queue that holds the next indices to visit. We keep expanding to other adjacent 1s as long as the queue is not empty. Whenever we encounter a value of -1 in our traversal, we ignore it since it is part on an island we’ve already counted.
+The top left diagonal is A[0][0], A[1][1], A[2][2], etc., and the diagonal to the right of that is A[0][1], A[1][2], A[2][3], etc. In general, the diagonal starting at A[r][c] is going to be enumerated by A[r+k][c+k].
 
-Pseudocode:
+How big is k? Say there are R rows and C columns. Then because (r+k, c+k) must be in bounds, 0 <= r+k < R and 0 <= c+k < C, so k < min(R-r, C-c) after some algebra.
 
-function getNumberOfIslands(binaryMatrix):
-    islands = 0
-    rows = binaryMatrix.length # number of rows
-    cols = binaryMatrix[0].length # number of columns
+Now, for each enumerated diagonal, let’s check whether each element of that diagonal is equal to it’s head representative in the first row/column. If it isn’t, the matrix isn’t Toeplitz.
 
-    for i from 0 to rows-1:
-        for j from 0 to cols-1:
-            if (binaryMatrix[i][j] == 1):
-                markIsland(binaryMatrix, rows, cols, i, j)
-                islands++
+This leads to the following solution:
 
-    return islands
+function isToeplitz(matrix):
+    R, C = matrix.length, matrix[0].length
 
-function markIsland(binaryMatrix, rows, cols, i, j):
-    q = new Queue()
-    q.push([i,j])
-    while (!q.isEmpty()):
-        item = q.pop()
-        x = item[0]
-        y = item[1]
-        if (binaryMatrix[x][y] == 1):
-            binaryMatrix[x][y] = -1
-            pushIfValid(q, rows, cols, x-1, y)
-            pushIfValid(q, rows, cols, x, y-1)
-            pushIfValid(q, rows, cols, x+1, y)
-            pushIfValid(q, rows, cols, x, y+1)
+    # For each diagonal starting in the first row at (0, c)
+    for c from 0 to C - 1:
+        start = matrix[0][c]
 
+        # For each element of that diagonal
+        for k from 0 to min(R, C-c) - 1:
+            if matrix[k][c+k] != start:
+                return false
 
-function pushIfValid(q, rows, cols, x, y):
-    if (x >= 0 AND x < rows AND y >= 0 AND y < cols):
-        q.push([x,y])
+    # Code repeated for starting in the first column
+    for r from 0 to R - 1:
+        start = matrix[r][0]
+        for k from 0 to min(R-r, C) - 1:
+            if matrix[r+k][k] != start:
+                return false
 
-Time Complexity: let N and M be the numbers of columns and rows in binaryMatrix, respectively. Each cell in binaryMatrix is visited a constant number of times. Once during the iteration and up to 4 times during an island expansion. Therefore, the time complexity is linear in the size of the input, i.e. O(N⋅M).
+    return true
+Additionally, there is a hashing solution available. Elements at position (r, c) are on the same diagonal if and only if they have the same “diagonal hash” value of r - c. That idea leads to the following solution:
 
-Space Complexity: since we are allocating a queue in the algorithm, the space complexity is linear O(N⋅M). For instance, consider a matrix that is all 1s.
+function isToeplitz(matrix):
+  # seen[diagonal_hash] = value of elements on that diagonal
+    seen = new HashTable()
+
+    # For each element
+    for r from 0 to matrix.length - 1:
+        for c from 0 to matrix[0].length - 1:
+            # If we haven't visited this diagonal before,
+            # record it's value
+            if r-c not in seen:
+                seen[r-c] = matrix[r][c]
+
+            # Otherwise, if the value we've recorded for
+            # this diagonal differs, return False
+            else if seen[r-c] != matrix[r][c]:
+                return False
+
+    return True
+We could also have used an array for seen, as there are R+C-1 different diagonal hashes and they are contiguous.
+
+Time Complexity: O(R * C) if the matrix has dimensions R x C. We iterate over every element exactly once and do constant work in between.
+
+Space Complexity: O(R + C) in the hashing solution, as there are R+C-1 diagonals, and each diagonal stores some value of the matrix. In the comparison solution, the (additional) space complexity is O(1).
 
 */
