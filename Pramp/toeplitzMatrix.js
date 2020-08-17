@@ -1,65 +1,29 @@
-/*   Island Count
+/*   Toeplitz Matrix
 
-Given a 2D array binaryMatrix of 0s and 1s, implement a function getNumberOfIslands that returns the number of islands of 1s in binaryMatrix.
+A Toeplitz matrix is a matrix where every left-to-right-descending diagonal has the same element. Given a non-empty matrix arr, write a function that returns true if and only if it is a Toeplitz matrix. The matrix can be any dimensions, not necessarily square.
 
-An island is defined as a group of adjacent values that are all 1s. A cell in binaryMatrix is considered adjacent to another cell if they are next to each either on the same row or column. Note that two values of 1 are not part of the same island if they’re sharing only a mutual “corner” (i.e. they are diagonally neighbors).
+For example,
 
-Explain and code the most efficient solution possible and analyze its time and space complexities.
+[[1,2,3,4],
+ [5,1,2,3],
+ [6,5,1,2]]
+is a Toeplitz matrix, so we should return true, while
 
-Example:
-
-input:  binaryMatrix = [ [0,    1,    0,    1,    0],
-                         [0,    0,    1,    1,    1],
-                         [1,    0,    0,    1,    0],
-                         [0,    1,    1,    0,    0],
-                         [1,    0,    1,    0,    1] ]
-
-output: 6 # since this is the number of islands in binaryMatrix.
+[[1,2,3,4],
+ [5,1,9,3],
+ [6,5,1,2]]
+isn’t a Toeplitz matrix, so we should return false.
 
 Constraints:
 
 [time limit] 5000ms
-[input] array.array.int binaryMatrix
-1 ≤ binaryMatrix.length ≤ 100
-1 ≤ binaryMatrix[i].length ≤ 100
-[output] integer
+[input] array.array.integer arr
+0 ≤ arr.length ≤ 20
+0 ≤ arr[i].length ≤ 20
+0 ≤ arr[i][j] ≤ 20
+[output] boolean
 */
 
-function getNumberOfIslands(binaryMatrix) {
-  let count = 0;
-
-  for (let i = 0; i < binaryMatrix.length; i++) {
-    for (let j = 0; j < binaryMatrix[i].length; j++) {
-      if (binaryMatrix[i][j] === 1) {
-        dfs(binaryMatrix, i, j)
-        count++;
-      }
-    }
-  }
-
-  return count;
-}
-
-function dfs (matrix, i, j, count = 0) {
-  //top, bottom, left, right
-  if (i < 0 || i >= matrix.length || j < 0 || j >= matrix[0].length) {
-    return 0;
-  }
-
-  if (matrix[i][j] === 0) return 0;
-
-  matrix[i][j] = 0;
-
-  //check to see if these are an island in itself first
-  let top = dfs(matrix, i - 1, j)
-  let bottom = dfs(matrix, i + 1, j)
-  let left = dfs(matrix, i, j - 1)
-  let right = dfs(matrix, i, j + 1)
-  //return
-}
-// n - matrix.length. m - matrix[i].length
-//Time - O(n*m). Worst case is actually n*m*d if every single ele was a 1 and recursive calls go as far as there are adjacent 1s, where d = # of recursive calls.
-//Space - O(n*m).
 
 /*
 ============== HINT ==============
