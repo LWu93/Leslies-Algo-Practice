@@ -94,5 +94,8 @@ const fizzBuzzFollowUp = (n, conditionals) => {
 
 fizzBuzzFollowUp(55, [[3, "Fizz"], [5, "Buzz"], [8, "Mazz"]])
 
-//Time - O(n). loop from 1 to n. Second loop is constant so it averges to o(n)
-//Space - O(n+k). Constant length of n # of words added to our res array. k - # of conditionals we have to check for, so we might be adding n amount of word that may be k length long. ex: "FizzBuzzBazzMazzJazz"
+//n - # of words added to our res array. k - # of conditionals we have to check for. So we might be adding n amount of word that may be k length long. ex: "FizzBuzzBazzMazzJazz". The condition of k being dynamic or fixed will alter the Time Complexity between O(n) and O(n*k), however, the space will stay the same.
+
+//Time - O(n*k) or O(n).
+//Space - O(n*k). Worst case - we have conditionals at every iteration of n.
+
