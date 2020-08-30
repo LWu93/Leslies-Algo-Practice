@@ -1,131 +1,113 @@
-//DID NOT TEST ON LC YET. APPROACH WORKS WITH GIVEN EXAMPLES
-
 /*
-Write a function to crush candy in one dimensional board. In candy crushing games, groups of like items are removed from the board. In this problem, any sequence of 3 or more like items should be removed and any items adjacent to that sequence should now be considered adjacent to each other. This process should be repeated as many time as possible. You should greedily remove characters from left to right.
+This question is about implementing a basic elimination algorithm for Candy Crush.
 
-Example 1:
-Input: "aaabbbc"
-Output: "c"
+Given a 2D integer array board representing the grid of candy, different positive integers board[i][j] represent different types of candies. A value of board[i][j] = 0 represents that the cell at position (i, j) is empty. The given board represents the state of the game following the player's move. Now, you need to restore the board to a stable state by crushing candies according to the following rules:
 
-Explanation:
-1. Remove 3 'a': "aaabbbc" => "bbbc"
-2. Remove 3 'b': "bbbc" => "c"
+If three or more candies of the same type are adjacent vertically or horizontally, "crush" them all at the same time - these positions become empty.
+After crushing all candies simultaneously, if an empty space on the board has candies on top of itself, then these candies will drop until they hit a candy or bottom at the same time. (No new candies will drop outside the top boundary.)
+After the above steps, there may exist more candies that can be crushed. If so, you need to repeat the above steps.
+If there does not exist more candies that can be crushed (ie. the board is stable), then return the current board.
+You need to perform the above rules until the board becomes stable, then return the current board.
 
-Example 2:
-Input: "aabbbacd"
-Output: "cd"
+Example:
 
-Explanation:
-1. Remove 3 'b': "aabbbacd" => "aaacd"
-2. Remove 3 'a': "aaacd" => "cd"
+Input:
+board =
+[[110,5,112,113,114],[210,211,5,213,214],[310,311,3,313,314],[410,411,412,5,414],[5,1,512,3,3],[610,4,1,613,614],[710,1,2,713,714],[810,1,2,1,1],[1,1,2,2,2],[4,1,4,4,1014]]
 
-Example 3:
-Input: "aabbccddeeedcba"
-Output: ""
+Output:
+[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[110,0,0,0,114],[210,0,0,0,214],[310,0,0,113,314],[410,0,0,213,414],[610,211,112,313,614],[710,311,412,613,714],[810,411,512,713,1014]]
 
-Explanation:
-1. Remove 3 'e': "aabbccddeeedcba" => "aabbccdddcba"
-2. Remove 3 'd': "aabbccdddcba" => "aabbcccba"
-3. Remove 3 'c': "aabbcccba" => "aabbba"
-4. Remove 3 'b': "aabbba" => "aaa"
-5. Remove 3 'a': "aaa" => ""
+Explanation: *diagram on LC*
 
-Example 4:
-Input: "aaabbbacd"
-Output: "acd"
+Note:
+The length of board will be in the range [3, 50].
+The length of board[i] will be in the range [3, 50].
+Each board[i][j] will initially start as an integer in the range [1, 2000].
 
-Explanation:
-1. Remove 3 'a': "aaabbbacd" => "bbbacd"
-2. Remove 3 'b': "bbbacd" => "acd"
 */
 
-//Psuedocode - using a stack
-//Your stack will track each ele you push in.
-//if stack.length > 2 and check if the last 2 eles in stack are == currChar
-//IF - it is, then while loop and pop() until !== currChar from stack
-//After doing that, you want to check if the last ele in stack is also crushable
-//create a helper func to help check if the stack is crushable
-//while loop will check if stack[lastIdx] === curr and the next char !== curr
-//Else - continue looping
+/**
+ * @param {number[][]} board
+ * @return {number[][]}
+ */
 
-//HF
-const check = (stack) => {
-  if (stack.length < 2) return false
-  let lastEle = stack[stack.length-1]
+/* psuedocode
+you need to loop through the entire board to see if there are any crushable rows or cols. Create a HF to check each row and col
 
-  for (let i = stack.length-2; i > stack.length-4; i--) {
-    if (stack[i] !== lastEle) return false
+HF - checkBoard
+check if the board is crushable. If it is, you want to crush and then move the candies down. Nested for loop through each row/col to look for each cell and if there is a 'c', we want to remove from that row/col
+
+HF - crushBoard.
+You need to crush the board to represent the new board after its crushed. uses a stack to check every single col
+
+*/
+var candyCrush = function(board) {
+  mark(board)
+  while(!isStable(board)) {
+    crush(board)
+    mark(board)
+  }
+  return board
+};
+
+//marks the candies on the board as crushable or not. If it is crushable, the element will be the negative representation of the element
+function mark(board) {
+  for (let row = 0; row < board.length; row++) {
+    for (let col = 0; col < board[0].length; col++) {
+      let fixed = Math.abs(board[row][col])
+      if (board[row + 1] &&
+        (Math.abs(board[row + 1][col]) === fixed) &&
+        (board[row - 1] &&
+          Math.abs(board[row - 1][col]) === fixed)) {
+        board[row - 1][col] = -Math.abs(board[row - 1][col])
+        board[row][col] = -Math.abs(board[row][col])
+        board[row + 1][col] = -Math.abs(board[row + 1][col])
+      }
+      if (Math.abs(board[row][col + 1]) === fixed && Math.abs(board[row][col - 1]) === fixed) {
+        board[row][col + 1] = -Math.abs(board[row][col + 1])
+        board[row][col] = -Math.abs(board[row][col])
+        board[row][col - 1] = -Math.abs(board[row][col - 1])
+      }
+    }
+  }
+}
+
+//checks if board is stable at every iteration
+function isStable(board) {
+  for (let row = 0; row < board.length; row++) {
+    for (let col = 0; col < board[0].length; col++) {
+      if (board[row][col] < 0) return false
+    }
   }
   return true
 }
 
-const candyCrush = (str) => {
-  let stack = [], ptr = 0, newStr = "";
-
-  while (ptr < str.length) {
-    let curr = str[ptr];
-
-    stack.push(curr)
-    let lastIdx = stack.length-1
-    let crushable = check(stack)
-
-    //if the last 3 in the stack are the same and the next letter is NOT the same
-    if (crushable && stack.length > 2) {
-      //the additional check is to cover the "greedily" part of the question.
-      while (stack[lastIdx] == curr && str[ptr+1] !== curr) {
-        stack.pop();
-        lastIdx--
+//crush HF takes advantage of using a stack to store each candy that needs to be crushed as the representation of a column.
+//we do a nested for loop "backwards" so we can go through each COL and add it to our stack if its a valid candy. Then we loop backwards so that we can refill in our bottom col with all valid candies. Finally, fill in the rest of the stack or col with 0s to represent empty cells.
+function crush(board) {
+  for (let col = 0; col < board[0].length; col++) {
+    let stack = []
+    for (let row = 0; row < board.length; row++) {
+      if (board[row][col] > 0) {
+        stack.push(board[row][col])
       }
     }
-
-    ptr++
-  }
-
-  //loop through stack and create our newStr
-  for (const char of stack) {
-    newStr += char
-  }
-
-  return newStr;
-}
-//n - str.length, k - longest adjacent chars
-//Time - O(n*k). While we do have 2 while loops, our avg time prob comes to O(n) but worst case is if the entire string was the same char. It would loop through 2x.
-//Space - O(n).  Stack will at most hold n # of chars
-
-//Optimize - instead of holding each individual char in the stack, we can set them as a pair -> [char, freq] in the stack so we can pop 1 item off our stack instead of having an additional for loop. To satisfy the "greedily" approach, you still need to check if the next char is !== currChar
-
-const candyCrush2 = (str) => {
-  let stack = [], newStr = "";
-
-  for (let i = 0; i < str.length; i++) {
-    let curr = str[i], lastIdx = stack.length-1
-    //check if stack.length exists and is equal to the top ele
-    if (stack.length && stack[lastIdx][0] === curr) {
-      stack[lastIdx][1]++;
-    } else {
-      stack.push([curr, 1])
+    let bottomInd = board.length - 1
+    while (stack.length) {
+      board[bottomInd][col] = stack.pop()
+      bottomInd--
     }
-
-    //if next ele is the same, you want to add it as part of your adjacent chars
-    if (i !== str.length && str[i+1] === curr) continue;
-    if (stack[stack.length-1][1] >= 3) stack.pop()
+    while (bottomInd >= 0) {
+      board[bottomInd][col] = 0
+      bottomInd--
+    }
   }
-
-  // build newStr from stack
-  for (const [char,freq] of stack) {
-    newStr += char.repeat(freq)
-  }
-
-  return newStr;
 }
-//n - str.length
-//Time - O(n). One loop through.
-//Space - O(n).  Stack will at most hold n # of chars.
+/* n - board.length. m - board[n].length
 
-candyCrush("aaabbbc") // "c"
-candyCrush("aabbbacd")// "cd"
-candyCrush("aabbccddeeedcba")// ""
-candyCrush("aaabbbacd") //"acd"
-candyCrush("aaaaawefbbbffaasbtrcd") //"weaasbtrcd". checks for greedy approach
-removeDups("aaaaawefbbbffaasbtrcdddddddd") //"weaasbtrcd". checks last adj chars
-removeDups("aaaaawefbbbffaasbtrcddddddddccrr") //"weaasbt".
+Time - O((n*m)^2). We need to check if the board is stable by doing a nested for loop. Then inside that while condition, we arecrushing the board and then remarking it.
+
+Space - O(1). Editing the board in-place.
+
+*/
